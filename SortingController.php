@@ -1,10 +1,10 @@
 <?php
 class SortFunctionality {
     public $reviews;
-    private $prioritizeByTextValue;
-    private $orderByRatingValue;
-    private $orderByDateValue;
-    private $minimumRatingValue;
+    private string $prioritizeByTextValue;
+    private string $orderByRatingValue;
+    private string $orderByDateValue;
+    private int $minimumRatingValue;
 
 
     public function __construct($reviews) {
@@ -30,16 +30,19 @@ class SortFunctionality {
             $this->minimumRatingValue = (int) $_POST['minimumRating'];
         }
 
-        $this->reviews = array_filter($this->reviews, function ($review) {
+        $this->reviews = array_values(array_filter($this->reviews, function ($review) {
             return (int)$review['rating'] >= $this->minimumRatingValue;
-        });
-
-        $this->reviews = array_values($this->reviews);
+        }));
     }
 
     private function sortByRating ($firstElement, $secondElement)
     {
-        if ($this->orderByRatingValue === 'Highest first') {
+        if ($this->orderByRatingValue === 'None') {
+            return;
+        }
+
+        if ($this->orderByRatingValue === 'Highest first')
+        {
             return $firstElement['rating'] < $secondElement['rating'];
         }
 
@@ -48,7 +51,8 @@ class SortFunctionality {
 
     private function sortByDate ($firstElement, $secondElement)
     {
-        if ($this->orderByDateValue === 'Newest first') {
+        if ($this->orderByDateValue === 'Newest first')
+        {
             return $firstElement['reviewCreatedOnTime'] < $secondElement['reviewCreatedOnTime'];
         }
 
@@ -71,12 +75,15 @@ class SortFunctionality {
 
     private function sortEquallyRated ($firstElement, $secondElement)
     {
+        if ($this->orderByDateValue === 'None') {
+            return;
+        }
+
         return (
             (
                 $firstElement['rating'] === $secondElement['rating'] &&
                 $this->sortByDate($firstElement, $secondElement)
-            ) || 
-            $this->sortByRating($firstElement, $secondElement)
+            ) || $this->sortByRating($firstElement, $secondElement)
         );
     }
 

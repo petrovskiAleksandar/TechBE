@@ -13,13 +13,16 @@
                 </option>
             </select>
             <br>
-            <label>Order by text:</label>
+            <label>Order by rating:</label>
             <select id="rating-filter" name="orderByRating">
                 <option>
                     Highest first
                 </option>
                 <option>
                     Lowest first
+                </option>
+                <option>
+                    None
                 </option>
             </select>
             <br>
@@ -30,6 +33,9 @@
                 </option>
                 <option>
                     Oldest first
+                </option>
+                <option>
+                    None
                 </option>
             </select>
             <br>
