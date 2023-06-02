@@ -9,12 +9,13 @@
 
     if (isset($_POST['filter']))
     {
-        echo $_POST['prioritizeByText'] . '<br/>';
+        echo ' prioritizeByText: ' . $_POST['prioritizeByText'] . '<br>';
         $prioritizeByTextValue = $_POST['prioritizeByText'];
-        echo $_POST['orderByRating'] . '<br/>';
+        echo ' orderByRating: ' . $_POST['orderByRating'] . '<br>';
         $orderByRatingValue = $_POST['orderByRating'];
-        echo $_POST['orderByDate'] . '<br/>';
+        echo 'orderByDate: ' . $_POST['orderByDate'] . '<br>';
         $orderByDateValue = $_POST['orderByDate'];
+        echo 'orderByDate: ' . $_POST['minimumRating'] . '<br>';
         $minimumRatingValue = (int) $_POST['minimumRating'];
     }
 
