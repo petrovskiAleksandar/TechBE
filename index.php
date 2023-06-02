@@ -13,7 +13,7 @@
                 </option>
             </select>
             <br>
-            <label>Prioritze by text:</label>
+            <label>Order by text:</label>
             <select id="rating-filter" name="orderByRating">
                 <option>
                     Highest first
@@ -54,6 +54,7 @@
             <br>
             <input type="submit" name="filter" value="filter">
         </form>
+        <br>
         <?php
             include 'SortingController.php';
         ?>

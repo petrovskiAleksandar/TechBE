@@ -1,136 +1,165 @@
 <?php
-    $reviewsJson = file_get_contents('reviews.json');
-    $reviews = json_decode($reviewsJson, true);
+class SortFunctionality {
+    public $reviews;
+    private $prioritizeByTextValue;
+    private $orderByRatingValue;
+    private $orderByDateValue;
+    private $minimumRatingValue;
 
-    $prioritizeByTextValue = '';
-    $orderByRatingValue = '';
-    $orderByDateValue = '';
-    $minimumRatingValue = 1;
 
-    if (isset($_POST['filter']))
-    {
-        echo ' prioritizeByText: ' . $_POST['prioritizeByText'] . '<br>';
-        $prioritizeByTextValue = $_POST['prioritizeByText'];
-        echo ' orderByRating: ' . $_POST['orderByRating'] . '<br>';
-        $orderByRatingValue = $_POST['orderByRating'];
-        echo 'orderByDate: ' . $_POST['orderByDate'] . '<br>';
-        $orderByDateValue = $_POST['orderByDate'];
-        echo 'orderByDate: ' . $_POST['minimumRating'] . '<br>';
-        $minimumRatingValue = (int) $_POST['minimumRating'];
+    public function __construct($reviews) {
+        $this->reviews = $reviews;
+        $this->prioritizeByTextValue = '';
+        $this->orderByRatingValue = '';
+        $this->orderByDateValue = '';
+        $this->minimumRatingValue = 1;
     }
 
-    $reviews = array_filter($reviews, function ($review) use ($minimumRatingValue) {
-        return (int)$review['rating'] >= $minimumRatingValue;
-    });
-    $reviews = array_values($reviews);
-
-    $sortByRating = function ($first, $second) use ($orderByRatingValue)
+    private function setFilterData ()
     {
-        if ($orderByRatingValue === 'Highest first') {
-            return $first['rating'] < $second['rating'];
+        if (isset($_POST['filter']))
+        {  
+            echo '<b>Active Filters:</b> <br>';
+            echo ' prioritizeByText: ' . $_POST['prioritizeByText'] . '<br>';
+            $this->prioritizeByTextValue = $_POST['prioritizeByText'];
+            echo ' orderByRating: ' . $_POST['orderByRating'] . '<br>';
+            $this->orderByRatingValue = $_POST['orderByRating'];
+            echo 'orderByDate: ' . $_POST['orderByDate'] . '<br>';
+            $this->orderByDateValue = $_POST['orderByDate'];
+            echo 'Minimum rating: ' . $_POST['minimumRating'] . '<br>';
+            $this->minimumRatingValue = (int) $_POST['minimumRating'];
         }
 
-        return $first['rating'] > $second['rating'];
-    };
+        $this->reviews = array_filter($this->reviews, function ($review) {
+            return (int)$review['rating'] >= $this->minimumRatingValue;
+        });
 
-    $sortByDate = function ($first, $second) use ($orderByDateValue)
+        $this->reviews = array_values($this->reviews);
+    }
+
+    private function sortByRating ($firstElement, $secondElement)
     {
-        if ($orderByDateValue === 'Newest first') {
-            return $first['reviewCreatedOnTime'] < $second['reviewCreatedOnTime'];
+        if ($this->orderByRatingValue === 'Highest first') {
+            return $firstElement['rating'] < $secondElement['rating'];
         }
 
-        return $first['reviewCreatedOnTime'] > $second['reviewCreatedOnTime'];
-    };
+        return $firstElement['rating'] > $secondElement['rating'];
+    }
 
-    $sortByText = function ($first, $second)
+    private function sortByDate ($firstElement, $secondElement)
+    {
+        if ($this->orderByDateValue === 'Newest first') {
+            return $firstElement['reviewCreatedOnTime'] < $secondElement['reviewCreatedOnTime'];
+        }
+
+        return $firstElement['reviewCreatedOnTime'] > $secondElement['reviewCreatedOnTime'];
+    }
+
+    private function sortByText ($firstElement, $secondElement)
     {
         return (
             (
-                strlen($second['reviewText']) === 0 &&
-                strlen($first['reviewText']) === 0
+                strlen($secondElement['reviewText']) === 0 &&
+                strlen($firstElement['reviewText']) === 0
             ) ||
             (
-                strlen($second['reviewText']) > 0 &&
-                strlen($first['reviewText']) > 0
+                strlen($secondElement['reviewText']) > 0 &&
+                strlen($firstElement['reviewText']) > 0
             )
         );
-    };
+    }
 
-    $sortRatingAndDate = function ($first, $second) use ($sortByDate, $sortByRating)
+    private function sortEquallyRated ($firstElement, $secondElement)
     {
         return (
             (
-                $first['rating'] === $second['rating'] &&
-                $sortByDate($first, $second)
+                $firstElement['rating'] === $secondElement['rating'] &&
+                $this->sortByDate($firstElement, $secondElement)
             ) || 
-            $sortByRating($first, $second)
+            $this->sortByRating($firstElement, $secondElement)
         );
-    };
+    }
 
-    $priorityFunction = function ($first, $second) use ($prioritizeByTextValue, $sortByRating, $sortByText, $sortRatingAndDate)
+    private function priorityFunction ($firstElement, $secondElement)
     {
-        if ($prioritizeByTextValue === 'Yes')
+        if ($this->prioritizeByTextValue === 'Yes')
         {
             return (
                 (
-                    $sortByText($first, $second) &&
-                    $sortRatingAndDate($first, $second)
+                    $this->sortByText($firstElement, $secondElement) &&
+                    $this->sortEquallyRated($firstElement, $secondElement)
                 ) ||
                 (
-                    strlen($second['reviewText']) > 0 &&
-                    strlen($first['reviewText']) === 0
+                    strlen($secondElement['reviewText']) > 0 &&
+                    strlen($firstElement['reviewText']) === 0
                 )
             );
         }
 
-        return $sortRatingAndDate($first, $second) || $sortByRating($first, $second);
-    };
+        return $this->sortEquallyRated($firstElement, $secondElement) || $this->sortByRating($firstElement, $secondElement);
+    }
 
-    for ($i = 0; $i < count($reviews); $i++)
+    public function sortArray ()
     {
-        $swapped = false;
+        $this->setFilterData();
 
-        for ($j = 0; $j < count($reviews) - $i - 1; $j++)
+        for ($i = 0; $i < count($this->reviews); $i++)
         {
-            if ($priorityFunction($reviews[$j], $reviews[$j + 1]))
+            $swapped = false;
+    
+            for ($j = 0; $j < count($this->reviews) - $i - 1; $j++)
             {
-                $temp = $reviews[$j];
-                $reviews[$j] = $reviews[$j + 1];
-                $reviews[$j + 1] = $temp;
-
-                $swapped = true;
+                if ($this->priorityFunction($this->reviews[$j], $this->reviews[$j + 1]))
+                {
+                    $temp = $this->reviews[$j];
+                    $this->reviews[$j] = $this->reviews[$j + 1];
+                    $this->reviews[$j + 1] = $temp;
+    
+                    $swapped = true;
+                }
+            }
+    
+            if ($swapped === false)
+            {
+                break;
             }
         }
-
-        if ($swapped === false)
-        {
-            break;
-        }
     }
 
-
-    echo <<<TEXT
-    <table style="padding: 100px">
-        <tr>
-            <th>Rating</th>
-            <th>Review Text</th>
-            <th>Created on</th>
-        </tr>
-    TEXT;
-
-    foreach ($reviews as $review)
+    public function listReviews ()
     {
-        $reviewRating = $review['rating'];
-        $reviewText = $review['reviewText'];
-        $reviewDate = $review['reviewCreatedOnTime'];
-
         echo <<<TEXT
-                <tr>
-                    <td>$reviewRating</td>
-                    <td>$reviewText</td>
-                    <td>$reviewDate</td>
-                </tr>
+        <table style="padding: 100px">
+            <tr>
+                <th>Rating</th>
+                <th>Review Text</th>
+                <th>Created on</th>
+            </tr>
         TEXT;
 
+        foreach ($this->reviews as $review)
+        {
+            $reviewRating = $review['rating'];
+            $reviewText = $review['reviewText'];
+            $reviewDate = $review['reviewCreatedOnTime'];
+
+            echo <<<TEXT
+                    <tr>
+                        <td>$reviewRating</td>
+                        <td>$reviewText</td>
+                        <td>$reviewDate</td>
+                    </tr>
+            TEXT;
+
+        }
     }
+}
+
+$reviewsJson = file_get_contents('reviews.json');
+$reviews = json_decode($reviewsJson, true);
+
+$sortFunctionality = new SortFunctionality($reviews);
+
+$sortFunctionality->sortArray();
+$sortFunctionality->listReviews();
 ?>
