@@ -15,7 +15,6 @@
         $orderByRating = $_POST['orderByRating'];
         echo $_POST['orderByDate'] . '<br/>';
         $orderByDate = $_POST['orderByDate'];
-        echo $_POST['minimumRating'] . '<br/>';
         $minimumRating = (int) $_POST['minimumRating'];
     }
 
@@ -49,11 +48,7 @@
         return $first['reviewCreatedOnTime'] > $second['reviewCreatedOnTime'];
     };
 
-    $sortIfRatingIsEqual = function ($first, $second) use ($sortByDate) {
-        $first['rating'] === $second['rating'] && $sortByDate($first, $second);
-    };
-    
-    $sortFunction = function ($first, $second) use ($prioritizeByText, $sortByRating, $sortIfRatingIsEqual)
+    $sortFunction = function ($first, $second) use ($prioritizeByText, $sortByRating, $sortByDate)
     {
         if ($prioritizeByText === 'Yes') {
             return (
@@ -61,7 +56,10 @@
                     strlen($second['reviewText']) > 0 &&
                     strlen($first['reviewText']) > 0 &&
                     (
-                        $sortIfRatingIsEqual($first, $second) ||
+                    (
+                        $first['rating'] === $second['rating'] &&
+                        $sortByDate($first, $second)
+                    ) ||
                         $sortByRating($first, $second)
                     )
                 ) ||
@@ -69,7 +67,10 @@
                     strlen($second['reviewText']) === 0 &&
                     strlen($first['reviewText']) === 0 &&
                     (
-                        $sortIfRatingIsEqual($first, $second) ||
+                        (
+                            $first['rating'] === $second['rating'] &&
+                            $sortByDate($first, $second)
+                        ) ||
                         $sortByRating($first, $second)
                     )
                 ) ||
@@ -81,7 +82,10 @@
         }
 
         return (
-                $sortIfRatingIsEqual($first, $second) ||
+                (
+                    $first['rating'] === $second['rating'] &&
+                    $sortByDate($first, $second)
+                ) ||
                 $sortByRating($first, $second)
             ) ||
             $sortByRating($first, $second);
@@ -126,14 +130,12 @@
         $reviewDate = $review['reviewCreatedOnTime'];
 
         echo <<<TEXT
-                <tr style="text-align: center">
-                    <td style="width: 100px;">$reviewRating</td>
-                    <td style="width: 100px;">$reviewText</td>
-                    <td style="width: 200px;">$reviewDate</td>
+                <tr>
+                    <td>$reviewRating</td>
+                    <td>$reviewText</td>
+                    <td>$reviewDate</td>
                 </tr>
         TEXT;
 
     }
-
-    echo '</table>';
 ?>
