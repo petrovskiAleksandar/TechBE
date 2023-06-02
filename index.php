@@ -2,9 +2,6 @@
 
 <html>
     <body>
-        <?php
-            include 'RandomController.php';
-        ?>
         <form action="" method="POST">
             <select name="prioritizeByText">
                 <option>
@@ -55,5 +52,8 @@
 
             <input type="submit" name="filter" value="Filter">
         </form>
+        <?php
+            include 'SortingController.php';
+        ?>
     </body>
 </html>

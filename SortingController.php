@@ -18,12 +18,9 @@
         $minimumRating = (int) $_POST['minimumRating'];
     }
 
-
-
     $reviews = array_filter($reviews, function ($review) use ($minimumRating){
         return (int)$review['rating'] >= $minimumRating;
-    }, ARRAY_FILTER_USE_BOTH);
-
+    });
     $reviews = array_values($reviews);
 
     function orderByRating ($first, $second, $orderByRating) {
@@ -77,7 +74,29 @@
     $reviews = sortArray($reviews, 'orderByRating', $orderByRating);
     $reviews = sortArray($reviews, 'prioritizeByText', $prioritizeByText);
 
+    echo <<<TEXT
+    <table style="padding: 100px">
+        <tr>
+            <th>Rating</th>
+            <th>Review Text</th>
+            <th>Created on</th>
+        </tr>
+    TEXT;
+
     foreach ($reviews as $review) {
-        echo $review['rating'] . ' - ' .$review['reviewText'] .$review['reviewCreatedOnTime'] .'<br>';
+        $reviewRating = $review['rating'];
+        $reviewText = $review['reviewText'];
+        $reviewDate = $review['reviewCreatedOnTime'];
+
+        echo <<<TEXT
+                <tr style="text-align: center">
+                    <td style="width: 100px;">$reviewRating</td>
+                    <td style="width: 100px;">$reviewText</td>
+                    <td style="width: 200px;">$reviewDate</td>
+                </tr>
+        TEXT;
+        // echo $review['rating'] . ' - ' .$review['reviewText'] .$review['reviewCreatedOnTime'] .'<br>';
     }
+
+    echo '</table>';
 ?>
