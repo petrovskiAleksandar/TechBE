@@ -20,15 +20,16 @@ class SortFunctionality {
     {
         if (isset($_POST['filter']))
         {  
+            $this->prioritizeByTextValue = $_POST['prioritizeByText'];
+            $this->orderByRatingValue = $_POST['orderByRating'];
+            $this->orderByDateValue = $_POST['orderByDate'];
+            $this->minimumRatingValue = (int) $_POST['minimumRating'];
+
             echo '<b>Active Filters:</b> <br>';
             echo ' prioritizeByText: ' . $_POST['prioritizeByText'] . '<br>';
-            $this->prioritizeByTextValue = $_POST['prioritizeByText'];
             echo ' orderByRating: ' . $_POST['orderByRating'] . '<br>';
-            $this->orderByRatingValue = $_POST['orderByRating'];
             echo 'orderByDate: ' . $_POST['orderByDate'] . '<br>';
-            $this->orderByDateValue = $_POST['orderByDate'];
             echo 'Minimum rating: ' . $_POST['minimumRating'] . '<br>';
-            $this->minimumRatingValue = (int) $_POST['minimumRating'];
         }
 
         $this->reviews = array_values(array_filter($this->reviews, function ($review) {
