@@ -137,14 +137,14 @@ class SortFunctionality {
 
     public function listReviews ()
     {
-        echo <<<TEXT
-        <table style="padding: 100px">
+        echo '
+        <table>
             <tr>
                 <th>Rating</th>
                 <th>Review Text</th>
                 <th>Created on</th>
             </tr>
-        TEXT;
+        ';
 
         foreach ($this->reviews as $review)
         {
@@ -152,15 +152,16 @@ class SortFunctionality {
             $reviewText = $review['reviewText'];
             $reviewDate = $review['reviewCreatedOnTime'];
 
-            echo <<<TEXT
-                    <tr>
-                        <td>$reviewRating</td>
-                        <td>$reviewText</td>
-                        <td>$reviewDate</td>
-                    </tr>
-            TEXT;
-
+            echo "
+                <tr>
+                    <td>$reviewRating</td>
+                    <td>$reviewText</td>
+                    <td>$reviewDate</td>
+                </tr>
+            ";
         }
+
+        echo '</table>';
     }
 }
 
