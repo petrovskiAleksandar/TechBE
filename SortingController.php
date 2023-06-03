@@ -1,13 +1,14 @@
 <?php
 class SortFunctionality {
-    public $reviews;
-    private string $prioritizeByTextValue;
-    private string $orderByRatingValue;
-    private string $orderByDateValue;
-    private int $minimumRatingValue;
+    private $reviews;
+    private $prioritizeByTextValue;
+    private $orderByRatingValue;
+    private $orderByDateValue;
+    private $minimumRatingValue;
 
 
-    public function __construct($reviews) {
+    public function __construct($reviews)
+    {
         $this->reviews = $reviews;
         $this->prioritizeByTextValue = '';
         $this->orderByRatingValue = '';
