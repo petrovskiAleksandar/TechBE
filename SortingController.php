@@ -82,10 +82,8 @@ class SortFunctionality {
         }
 
         return (
-            (
-                $firstElement['rating'] === $secondElement['rating'] &&
-                $this->sortByDate($firstElement, $secondElement)
-            ) || $this->sortByRating($firstElement, $secondElement)
+            $firstElement['rating'] === $secondElement['rating'] &&
+            $this->sortByDate($firstElement, $secondElement)
         );
     }
 
@@ -96,7 +94,10 @@ class SortFunctionality {
             return (
                 (
                     $this->sortByText($firstElement, $secondElement) &&
-                    $this->sortEquallyRated($firstElement, $secondElement)
+                    (
+                        $this->sortEquallyRated($firstElement, $secondElement) ||
+                        $this->sortByRating($firstElement, $secondElement)
+                    )
                 ) ||
                 (
                     strlen($secondElement['reviewText']) > 0 &&
